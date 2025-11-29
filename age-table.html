@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>年齢早見表｜年齢・干支・和暦 一括計算ツール</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="生まれ年ごとの今年の満年齢・和暦・干支を一覧できる年齢早見表です。スマホで見やすい縦スクロールのカードUIです。">
+  <meta name="description" content="生まれ年ごとの今年の満年齢・和暦・干支を一覧できる年齢早見表です。還暦・喜寿・米寿・卒寿などの長寿祝いも自動で表示します。スマホで見やすい縦スクロールのカードUIです。">
   <style>
     :root {
       --bg: #f5f5f7;
@@ -121,6 +121,10 @@
     .age-detail-value {
       font-weight: 500;
     }
+    .age-detail-value-highlight {
+      font-weight: 600;
+      color: var(--accent);
+    }
     .bottom-nav {
       position: fixed;
       left: 0;
@@ -164,7 +168,6 @@
       background: #f9fafb;
     }
 
-    /* PC時は行間を少し詰める程度で、基本1カラムのまま */
     @media (min-width: 768px) {
       .age-item {
         padding: 6px 0;
@@ -186,7 +189,7 @@
       <h1>年齢早見表</h1>
       <p class="lead">
         生まれ年ごとの「今年の満年齢」「和暦」「干支」を一覧できます。<br>
-        誕生日を迎えたあとの年齢として、「西暦の年 − 生まれ年」でシンプルに計算しています。
+        さらに、今年が還暦・古希・喜寿・傘寿・米寿・卒寿・白寿・百寿（紀寿）にあたる場合は、長寿祝いとして表示します。
       </p>
       <label for="decadeFilter">表示する生まれ年（年代）</label>
       <select id="decadeFilter">
@@ -204,7 +207,9 @@
 
     <footer>
       <div class="footer-links">
-        <a href="index.html">一括計算ツールに戻る</a>
+        <a href="index.html">一括計算ツールに戻る</a>｜
+        <a href="how-to.html">使い方</a>｜
+        <a href="about.html">このサイトについて</a>
       </div>
       <div class="ad-slot">
         ここに広告を1つだけ表示します（例：レスポンシブ広告タグ）。
@@ -257,8 +262,24 @@
     return etoList[index < 0 ? index + 12 : index];
   }
 
+  // 長寿祝い（今年の満年齢ベース）
+  const LONGEVITY_MILESTONES = {
+    60: '還暦',
+    70: '古希',
+    77: '喜寿',
+    80: '傘寿',
+    88: '米寿',
+    90: '卒寿',
+    99: '白寿',
+    100: '百寿（紀寿）'
+  };
+
   function getAgeThisYear(birthYear) {
     return CURRENT_YEAR - birthYear;
+  }
+
+  function getLongevityLabel(age) {
+    return LONGEVITY_MILESTONES[age] || null;
   }
 
   function buildDecadeOptions() {
@@ -275,7 +296,7 @@
       decadeSelect.appendChild(opt);
     });
 
-    currentYearInfo.textContent = `※ ${CURRENT_YEAR}年時点の満年齢を表示しています。`;
+    currentYearInfo.textContent = `※ ${CURRENT_YEAR}年時点の満年齢と長寿祝い（該当がある場合）を表示しています。`;
   }
 
   function renderList() {
@@ -289,6 +310,7 @@
       const age = getAgeThisYear(y);
       const era = toJapaneseEra(y);
       const eto = getEto(y);
+      const longevity = getLongevityLabel(age);
 
       const item = document.createElement('div');
       item.className = 'age-item';
@@ -307,22 +329,40 @@
       header.appendChild(yearEl);
       header.appendChild(subEl);
 
-      const detail = document.createElement('div');
-      detail.className = 'age-detail';
+      const detailAge = document.createElement('div');
+      detailAge.className = 'age-detail';
 
-      const label = document.createElement('div');
-      label.className = 'age-detail-label';
-      label.textContent = '今年の満年齢';
+      const labelAge = document.createElement('div');
+      labelAge.className = 'age-detail-label';
+      labelAge.textContent = '今年の満年齢';
 
-      const valueEl = document.createElement('div');
-      valueEl.className = 'age-detail-value';
-      valueEl.textContent = age >= 0 ? `${age}歳` : '—';
+      const valueAge = document.createElement('div');
+      valueAge.className = 'age-detail-value';
+      valueAge.textContent = age >= 0 ? `${age}歳` : '—';
 
-      detail.appendChild(label);
-      detail.appendChild(valueEl);
+      detailAge.appendChild(labelAge);
+      detailAge.appendChild(valueAge);
 
       item.appendChild(header);
-      item.appendChild(detail);
+      item.appendChild(detailAge);
+
+      // 長寿祝いがある場合のみ追加行を表示
+      if (longevity) {
+        const detailLong = document.createElement('div');
+        detailLong.className = 'age-detail';
+
+        const labelLong = document.createElement('div');
+        labelLong.className = 'age-detail-label';
+        labelLong.textContent = '長寿祝い';
+
+        const valueLong = document.createElement('div');
+        valueLong.className = 'age-detail-value age-detail-value-highlight';
+        valueLong.textContent = `${longevity}`;
+
+        detailLong.appendChild(labelLong);
+        detailLong.appendChild(valueLong);
+        item.appendChild(detailLong);
+      }
 
       ageList.appendChild(item);
     }

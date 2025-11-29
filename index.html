@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>年齢・干支・和暦・西暦・学年 一括計算ツール</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="生年月日を1回入力するだけで、年齢・数え年・干支・和暦・西暦・学年・節目年齢を一括表示する、スマホ特化の年齢計算ツールです。">
+  <meta name="description" content="生年月日を1回入力するだけで、年齢・数え年・干支・和暦・学年・節目年齢を一括表示する、スマホ特化の年齢計算ツールです。">
   <style>
     :root {
       --bg: #f5f5f7;
@@ -14,7 +14,6 @@
       --text-main: #111827;
       --text-sub: #6b7280;
       --border: #e5e7eb;
-      --danger: #dc2626;
       --radius-lg: 16px;
     }
     * { box-sizing: border-box; }
@@ -28,7 +27,7 @@
       max-width: 480px;
       margin: 0 auto;
       min-height: 100vh;
-      padding-bottom: 72px; /* bottom nav */
+      padding-bottom: 72px;
     }
     header {
       position: sticky;
@@ -146,9 +145,6 @@
       text-decoration: none;
       margin-right: 8px;
     }
-    .bottom-links a:visited {
-      color: var(--accent);
-    }
     .badge {
       display: inline-block;
       font-size: 11px;
@@ -191,9 +187,6 @@
       color: var(--text-sub);
       text-decoration: none;
     }
-    .nav-item span {
-      display: block;
-    }
     .nav-item.active {
       color: var(--accent);
       font-weight: 600;
@@ -204,11 +197,6 @@
       font-size: 11px;
       color: var(--text-sub);
       text-align: center;
-    }
-    .footer-links a {
-      color: var(--accent);
-      text-decoration: none;
-      margin: 0 6px;
     }
     .ad-slot {
       margin-top: 8px;
@@ -307,9 +295,7 @@
         </div>
         <button class="copy-btn" data-copy-target="milestoneCard">コピー</button>
       </div>
-      <div id="milestoneCard">
-        <!-- JSでリスト生成 -->
-      </div>
+      <div id="milestoneCard"></div>
     </section>
 
     <section class="card">
@@ -381,16 +367,13 @@
   const refInput = document.getElementById('referenceDate');
   const calcBtn = document.getElementById('calcBtn');
 
-  // 初期値設定
   window.addEventListener('DOMContentLoaded', () => {
     const today = new Date();
-    const iso = today.toISOString().slice(0, 10);
-    refInput.value = iso;
+    refInput.value = today.toISOString().slice(0, 10);
   });
 
   useTodayCheckbox.addEventListener('change', () => {
-    const useToday = useTodayCheckbox.checked;
-    refDateRow.style.display = useToday ? 'none' : 'block';
+    refDateRow.style.display = useTodayCheckbox.checked ? 'none' : 'block';
   });
 
   calcBtn.addEventListener('click', () => {
@@ -425,34 +408,30 @@
     document.getElementById('ageYears').textContent = `${age}歳`;
     document.getElementById('kazoedos').textContent = `${age + 1}歳`;
 
-    const diffMs = baseDate - birth;
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const days = Math.floor((baseDate - birth) / (1000 * 60 * 60 * 24));
     document.getElementById('daysSinceBirth').textContent = `${days.toLocaleString()}日`;
   }
 
   function calcAge(birth, baseDate) {
     let age = baseDate.getFullYear() - birth.getFullYear();
     const m = baseDate.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && baseDate.getDate() < birth.getDate())) {
-      age--;
-    }
+    if (m < 0 || (m === 0 && baseDate.getDate() < birth.getDate())) age--;
     return age;
   }
 
   function updateCalendarInfo(birth) {
     const y = birth.getFullYear();
-    const era = toJapaneseEra(y);
-    document.getElementById('eraText').textContent = `${y}年（${era}）`;
+    document.getElementById('eraText').textContent =
+      `${y}年（${toJapaneseEra(y)}）`;
 
-    const eto = getEto(y);
-    document.getElementById('eto').textContent = eto;
+    document.getElementById('eto').textContent = getEto(y);
 
     const weekdayNames = ['日', '月', '火', '水', '木', '金', '土'];
-    document.getElementById('weekday').textContent = weekdayNames[birth.getDay()] + '曜日';
+    document.getElementById('weekday').textContent =
+      weekdayNames[birth.getDay()] + '曜日';
   }
 
   function toJapaneseEra(year) {
-    // シンプル版：必要に応じて拡張
     if (year >= 2019) return `令和${year - 2018}年`;
     if (year >= 1989) return `平成${year - 1988}年`;
     if (year >= 1926) return `昭和${year - 1925}年`;
@@ -476,88 +455,89 @@
       const era = toJapaneseEra(year);
       const row = document.createElement('div');
       row.className = 'result-row';
-      const label = document.createElement('div');
-      label.className = 'result-label';
-      label.textContent = `${m}歳の年`;
-      const value = document.createElement('div');
-      value.className = 'result-value';
-      value.textContent = `${year}年（${era}）`;
-      row.appendChild(label);
-      row.appendChild(value);
+      row.innerHTML = `
+        <div class="result-label">${m}歳の年</div>
+        <div class="result-value">${year}年（${era}）</div>
+      `;
       container.appendChild(row);
     });
   }
 
+  // ★ 修正版：日本の学年ルール（4/2〜翌4/1）に完全準拠
   function updateSchoolInfo(birth, baseDate) {
-    const birthYear = birth.getFullYear();
-    const birthMonth = birth.getMonth() + 1;
-    const birthDay = birth.getDate();
+    const by = birth.getFullYear();
+    const bm = birth.getMonth() + 1;
+    const bd = birth.getDate();
 
-    // 同学年の開始年（4/2〜翌4/1）
-    let schoolYearStart;
-    if (birthMonth > 4 || (birthMonth === 4 && birthDay >= 2)) {
-      schoolYearStart = birthYear;
+    // 小学校入学年度
+    let enter;
+    if (bm > 4 || (bm === 4 && bd >= 2)) {
+      enter = by + 7; // 4/2〜12/31
     } else {
-      schoolYearStart = birthYear - 1;
+      enter = by + 6; // 1/1〜4/1
     }
-    const elemEnterYear = schoolYearStart + 6; // 小1の西暦
-    const highGradYear = elemEnterYear + 11;   // 高3卒業の西暦（小6〜中3〜高3）
 
-    document.getElementById('elemEnterYear').textContent =
-      `${elemEnterYear}年（${toJapaneseEra(elemEnterYear)}）`;
-    document.getElementById('highGradYear').textContent =
-      `${highGradYear}年（${toJapaneseEra(highGradYear)}）`;
+    const grad = enter + 12;
 
-    const age = calcAge(birth, baseDate);
+    // 現在の学年度
+    const cy = baseDate.getFullYear();
+    const cm = baseDate.getMonth() + 1;
+    const schoolYear = cm >= 4 ? cy : cy - 1;
+
+    // index=0が小1
+    const index = schoolYear - enter;
+
     let stage = '未就学';
-    let gradeText = '–';
+    let grade = '–';
 
-    if (age < 0) {
-      stage = '未到来';
-    } else if (age < 6) {
+    if (index < 0) {
       stage = '未就学';
-    } else if (age >= 6 && age <= 11) {
+    } else if (index <= 5) {
       stage = '小学生';
-      gradeText = `小${age - 5}年生`;
-    } else if (age >= 12 && age <= 14) {
+      grade = `${index + 1}年生`;
+    } else if (index <= 8) {
       stage = '中学生';
-      gradeText = `中${age - 11}年生`;
-    } else if (age >= 15 && age <= 17) {
+      grade = `${index - 5}年生`;
+    } else if (index <= 11) {
       stage = '高校生';
-      gradeText = `高${age - 14}年生`;
-    } else if (age >= 18 && age <= 22) {
+      grade = `${index - 8}年生`;
+    } else if (index <= 15) {
       stage = '大学生など';
-      gradeText = `${age - 17}年生相当`;
+      grade = `${index - 11}年生相当`;
     } else {
       stage = '社会人など';
+      grade = '–';
     }
 
+    document.getElementById('elemEnterYear').textContent =
+      `${enter}年（${toJapaneseEra(enter)}）`;
+    document.getElementById('highGradYear').textContent =
+      `${grad}年（${toJapaneseEra(grad)}）`;
+
     document.getElementById('schoolStage').textContent = stage;
-    document.getElementById('schoolGrade').textContent = gradeText;
+    document.getElementById('schoolGrade').textContent = grade;
   }
 
-  // カード単位コピー
+  // カードコピー
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const targetId = btn.getAttribute('data-copy-target');
-      const card = document.getElementById(targetId);
-      if (!card) return;
+      const target = document.getElementById(btn.dataset.copyTarget);
       const texts = [];
-      card.querySelectorAll('.result-row').forEach(row => {
+      target.querySelectorAll('.result-row').forEach(row => {
         const label = row.querySelector('.result-label')?.textContent ?? '';
         const value = row.querySelector('.result-value')?.textContent ?? '';
-        if (label || value) texts.push(`${label}：${value}`);
+        texts.push(`${label}：${value}`);
       });
-      const text = texts.join('\n');
       try {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(texts.join('\n'));
         btn.textContent = 'コピー済';
-        setTimeout(() => { btn.textContent = 'コピー'; }, 1200);
+        setTimeout(() => btn.textContent = 'コピー', 1200);
       } catch {
         alert('コピーに失敗しました。');
       }
     });
   });
 </script>
+
 </body>
 </html>

@@ -15,6 +15,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="生年月日を1回入力するだけで、満年齢・数え年・干支・和暦・節目年齢・学年・社会人年数までを一括表示できる、スマホ特化の年齢計算ツールです。広告を最小限に抑えた、軽くて見やすいWebアプリです。">
   <link rel="canonical" href="https://cleverkitjp.github.io/age-eto-tool/">
+  <link rel="stylesheet" href="https://cleverkitjp.github.io/common.css">
 
   <!-- OGP -->
   <meta property="og:type" content="website">
@@ -366,9 +367,6 @@
         <a href="about.html">このサイトについて</a>｜
         <a href="how-to.html">使い方</a>
       </div>
-      <div class="ad-slot">
-       <!-- ここに広告を1つだけ表示します（例：レスポンシブ広告タグ）。-->
-      </div>
       <p class="back-to-top">
        <a href="https://cleverkitjp.github.io/">cleverkitjp トップページへ戻る</a>
       </p>
@@ -570,6 +568,22 @@
       }
     });
   });
+</script>
+
+<div id="ck-footer-container"></div>
+<script>
+  (function() {
+    var container = document.getElementById('ck-footer-container');
+    if (!container) return;
+
+    fetch('https://cleverkitjp.github.io/footer.html')
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        container.innerHTML = html;
+        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+      })
+      .catch(function(e) {});
+  })();
 </script>
 
 </body>

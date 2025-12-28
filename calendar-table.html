@@ -141,20 +141,11 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    footer {
+    .footer-links {
       padding: 12px;
       font-size: 11px;
       color: var(--text-sub);
       text-align: center;
-    }
-    .ad-slot {
-      margin-top: 8px;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px dashed var(--border);
-      font-size: 11px;
-      color: var(--text-sub);
-      background: #f9fafb;
     }
     .bottom-nav {
       position: fixed;
@@ -223,15 +214,26 @@
         <!-- JSで年ごとの行を生成 -->
       </div>
     </section>
-
-    <footer>
       <div class="footer-links">
         <a href="index.html">一括計算ツールに戻る</a>
       </div>
-    </footer>
   </main>
 </div>
+<div id="ck-footer-container"></div>
+<script>
+  (function() {
+    var container = document.getElementById('ck-footer-container');
+    if (!container) return;
 
+    fetch('https://cleverkitjp.github.io/footer.html')
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        container.innerHTML = html;
+        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+      })
+      .catch(function(e) {});
+  })();
+</script>
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
     <a href="index.html" class="nav-item">
@@ -344,22 +346,6 @@
       ERAS.find(e => e.key === 'reiwa') || ERAS[ERAS.length - 1];
     setActiveEra(defaultEra.key);
   });
-</script>
-
-<div id="ck-footer-container"></div>
-<script>
-  (function() {
-    var container = document.getElementById('ck-footer-container');
-    if (!container) return;
-
-    fetch('https://cleverkitjp.github.io/footer.html')
-      .then(function(r) { return r.text(); })
-      .then(function(html) {
-        container.innerHTML = html;
-        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-      })
-      .catch(function(e) {});
-  })();
 </script>
 
 </body>

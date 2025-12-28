@@ -353,6 +353,22 @@
       </div>
     
   </main>
+  <div id="ck-footer-container"></div>
+<script>
+  (function() {
+    var container = document.getElementById('ck-footer-container');
+    if (!container) return;
+
+    fetch('https://cleverkitjp.github.io/footer.html')
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        container.innerHTML = html;
+        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+      })
+      .catch(function(e) {});
+  })();
+</script>
+  
 </div>
 
 <nav class="bottom-nav">
@@ -549,22 +565,6 @@
       }
     });
   });
-</script>
-
-<div id="ck-footer-container"></div>
-<script>
-  (function() {
-    var container = document.getElementById('ck-footer-container');
-    if (!container) return;
-
-    fetch('https://cleverkitjp.github.io/footer.html')
-      .then(function(r) { return r.text(); })
-      .then(function(html) {
-        container.innerHTML = html;
-        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-      })
-      .catch(function(e) {});
-  })();
 </script>
 
 </body>

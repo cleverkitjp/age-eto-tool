@@ -162,20 +162,11 @@
       font-weight: 600;
       border-top: 2px solid var(--accent);
     }
-    footer {
+    .footer-links {
       padding: 12px;
       font-size: 11px;
       color: var(--text-sub);
       text-align: center;
-    }
-    .ad-slot {
-      margin-top: 8px;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px dashed var(--border);
-      font-size: 11px;
-      color: var(--text-sub);
-      background: #f9fafb;
     }
 
     @media (min-width: 768px) {
@@ -215,14 +206,28 @@
       </div>
     </section>
 
-    <footer>
       <div class="footer-links">
         <a href="index.html">一括計算ツールに戻る</a>｜
         <a href="how-to.html">使い方</a>｜
         <a href="about.html">このサイトについて</a>
       </div>
-    </footer>
+    
+    <div id="ck-footer-container"></div>
   </main>
+  <script>
+  (function() {
+    var container = document.getElementById('ck-footer-container');
+    if (!container) return;
+
+    fetch('https://cleverkitjp.github.io/footer.html')
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        container.innerHTML = html;
+        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+      })
+      .catch(function(e) {});
+  })();
+  </script>
 </div>
 
 <nav class="bottom-nav">
@@ -383,21 +388,6 @@
   });
 </script>
 
-<div id="ck-footer-container"></div>
-<script>
-  (function() {
-    var container = document.getElementById('ck-footer-container');
-    if (!container) return;
-
-    fetch('https://cleverkitjp.github.io/footer.html')
-      .then(function(r) { return r.text(); })
-      .then(function(html) {
-        container.innerHTML = html;
-        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-      })
-      .catch(function(e) {});
-  })();
-</script>
 
 </body>
 </html>
